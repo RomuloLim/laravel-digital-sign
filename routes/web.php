@@ -19,6 +19,7 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', [PdfController::class, 'index'])->middleware(['auth'])->name('pdf.index');
+Route::post('/pdf/create', [PdfController::class, 'store'])->middleware(['auth'])->name('pdf.store');
 
 // Route::get('/dashboard', function () {
 //     return view('dashboard');

@@ -8,4 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class Pdf extends Model
 {
     use HasFactory;
+    protected $table = 'pdfs';
+    protected $guarded = ['id', 'user_id'];
 }
