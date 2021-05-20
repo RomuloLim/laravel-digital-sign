@@ -49,4 +49,8 @@ class PdfController extends Controller
 
         return response()->json($document);
     }
+
+    public function signPage($id){
+        return view('pdf.sign', compact('id'));
+    }
 }

@@ -34,7 +34,7 @@
             <td>{{ $doc->name }}</td>
             <td>{{ $doc->author }}</td>
             <td>
-                <a class="waves-effect waves-light btn green darken-1 tooltipped" data-position="left" data-tooltip="Assinar"><i class="large material-icons">check</i></a>
+                <a href="{{ route('pdf.signPage', $doc->id)}}" class="waves-effect waves-light btn green darken-1 tooltipped modal-trigger" data-position="left" data-tooltip="Assinar"><i class="large material-icons">check</i></a>
                 <a href="{{ route('pdf.show', $doc->id) }}" class="waves-effect waves-light btn cyan darken-1 tooltipped" data-position="top" data-tooltip="Ver"><i class="large material-icons">remove_red_eye</i></a>
                 <a href="{{ route('pdf.destroy', $doc->id) }}" class="waves-effect waves-light btn red darken-1 tooltipped" id="deleteDoc" data-position="right" data-tooltip="Deletar"><i class="large material-icons">delete</i></a>
             </td>
@@ -45,7 +45,8 @@
       {{ $documents->links() }}
             </div>
         </div>
-          <!-- Modal Structure -->
+
+          <!-- Modal Cadastro -->
   <div id="modal1" class="modal">
       <div class="showAlert"></div>
     <div class="modal-content">
@@ -125,12 +126,6 @@
                         );
 
                         $("#reload").load("{{ route('pdf.index') }} #line");
-
-                        // $("#tableRegist").prepend('<tr><td>'+response.name+'</td>'+
-                        //     '<td>'+response.author+'</td>'+
-                        //     '<td><a class="waves-effect waves-light btn green darken-1 tooltipped" data-position="left" data-tooltip="Assinar"><i class="large material-icons">check</i></a>'+
-                        //     ' <a href="'+doc_id+'" class="waves-effect waves-light btn cyan darken-1 tooltipped" data-position="top" data-tooltip="Ver"><i class="large material-icons">remove_red_eye</i></a>'+
-                        //     '<a class="waves-effect waves-light btn red darken-1 tooltipped" data-position="right" data-tooltip="Deletar"><i class="large material-icons">delete</i></a></td</tr>');
                         $("#fileForm")[0].reset();
                         $("#modal1").modal('close');
                     }
@@ -142,12 +137,6 @@
                     title: 'Oops...',
                     text: 'Preencha os dados corretamente!',
                     })
-                // $('.modalValidate').empty();
-                // $.each(err.responseJSON.errors, function(key, error){
-                //     console.log(error);
-                //     $('.showAlert').after('<div class=" modalValidate alert card red lighten-4 red-text text-darken-4"><div class="card-content"><p><i class="material-icons">report</i><span>Erro: </span> '+error[0] + (error[1] != undefined ? '<br>' + error[1] : '') +'</p></div></div>');
-                //     $('.modalValidate').delay(4000).fadeOut(500);
-                // });
               }
             })
         });
