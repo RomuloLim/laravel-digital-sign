@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreUpdatePdf;
 use App\Models\Pdf;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -11,7 +12,11 @@ use Illuminate\Support\Facades\Storage;
 class PdfController extends Controller
 {
     public function index(){
+        $user = User::find(Auth::id());
+        if($user->is_admin == true)
         $documents = Pdf::latest()->simplePaginate(5);
+        else
+        $documents = Pdf::where('user_id', '=', Auth::id())->latest()->simplePaginate(5);
         return view('pdf.index', compact('documents'));
     }
 

@@ -23,9 +23,9 @@ Route::get('/index/{id}', [PdfController::class, 'show'])->middleware(['auth'])-
 Route::delete('/delete/{id}', [PdfController::class, 'destroy'])->middleware(['auth'])->name('pdf.destroy');
 Route::post('/pdf/create', [PdfController::class, 'store'])->middleware(['auth'])->name('pdf.store');
 
-// Route::get('/dashboard', function () {
-//     return view('dashboard');
-// })->middleware(['auth'])->name('dashboard');
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth'])->name('dashboard');
 
 
 require __DIR__.'/auth.php';
