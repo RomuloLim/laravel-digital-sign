@@ -4,13 +4,13 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
-
         <!-- Compiled and minified CSS -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link rel="stylesheet" href="{{ URL::asset('css/style.css')  }}">
         <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
         <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+        <meta name="_token" content="{{ csrf_token() }}">
       <title>Document</title>
     </head>
     <body>
@@ -28,28 +28,31 @@
           </tr>
         </thead>
 
-        <tbody>
-          {{-- <tr>
-            <td>Termo de adesão</td>
-            <td>Rômulo Lima Fonseca</td>
+        <tbody id="reload">
+    @foreach ($documents as $doc)
+        <tr id="line">
+            <td>{{ $doc->name }}</td>
+            <td>{{ $doc->author }}</td>
             <td>
-                <a class="waves-effect waves-light btn green darken-1 tooltipped" data-position="top" data-tooltip="Assinar"><i class="large material-icons">check</i></a>
-                <a class="waves-effect waves-light btn cyan darken-1 tooltipped" data-position="top" data-tooltip="Ver"><i class="large material-icons">remove_red_eye</i></a>
-                <a class="waves-effect waves-light btn red darken-1 tooltipped" data-position="top" data-tooltip="Deletar"><i class="large material-icons">delete</i></a>
-        </td>
-          </tr> --}}
+                <a class="waves-effect waves-light btn green darken-1 tooltipped" data-position="left" data-tooltip="Assinar"><i class="large material-icons">check</i></a>
+                <a href="{{ route('pdf.show', $doc->id) }}" class="waves-effect waves-light btn cyan darken-1 tooltipped" data-position="top" data-tooltip="Ver"><i class="large material-icons">remove_red_eye</i></a>
+                <a href="{{ route('pdf.destroy', $doc->id) }}" class="waves-effect waves-light btn red darken-1 tooltipped" id="deleteDoc" data-position="right" data-tooltip="Deletar"><i class="large material-icons">delete</i></a>
+            </td>
+          </tr>
+    @endforeach
         </tbody>
       </table>
+      {{ $documents->links() }}
             </div>
         </div>
-
           <!-- Modal Structure -->
   <div id="modal1" class="modal">
+      <div class="showAlert"></div>
     <div class="modal-content">
       <h4 class="center">Enviar documento</h4>
       <br><br>
       <div class="row">
-        <form class="col s12" action="{{ route('pdf.store') }}" method="POST" id="fileForm">
+        <form class="col s12" id="fileForm" enctype="multipart/form-data" method="POST">
             @csrf
             <div class="input-field col s6">
               <input placeholder="Arquivo" id="name" name="name" type="text" class="validate">
@@ -93,39 +96,115 @@
             $('.tooltipped').tooltip();
         });
     </script>
-{{--
+
     <script>
+        $.ajaxSetup({
+            headers: {
+            'X-CSRF-Token': $('meta[name="_token"]').attr('content')
+            }
+        });
+
         $('#fileForm').submit(function(e){
             e.preventDefault();
-
             $.ajax({
                 url: "{{ route('pdf.store') }}",
                 type: "POST",
-                data: $(this).serialize(),
+                data: new FormData(this),
+                // data: $(this).serialize(),
+                contentType: false,
+                cache: false,
+                processData: false,
                 dataType: 'json',
                 success:function(response){
+                    console.log(response);
                     if(response){
                         Swal.fire(
                             'Sucesso!',
                             'Documento enviado',
                             'success'
                         );
-                        $("#tableRegist").prepend('<tr><td>'+response.name+'</td><td>'+response.author+'</td></tr>');
+
+                        $("#reload").load("{{ route('pdf.index') }} #line");
+
+                        // $("#tableRegist").prepend('<tr><td>'+response.name+'</td>'+
+                        //     '<td>'+response.author+'</td>'+
+                        //     '<td><a class="waves-effect waves-light btn green darken-1 tooltipped" data-position="left" data-tooltip="Assinar"><i class="large material-icons">check</i></a>'+
+                        //     ' <a href="'+doc_id+'" class="waves-effect waves-light btn cyan darken-1 tooltipped" data-position="top" data-tooltip="Ver"><i class="large material-icons">remove_red_eye</i></a>'+
+                        //     '<a class="waves-effect waves-light btn red darken-1 tooltipped" data-position="right" data-tooltip="Deletar"><i class="large material-icons">delete</i></a></td</tr>');
                         $("#fileForm")[0].reset();
-                        $("#modal1").modal('hide');
+                        $("#modal1").modal('close');
                     }
                 },
                 error:function(err){
-                $('.modalValidate').empty();
-                $.each(err.responseJSON.errors, function(key, error){
-                    console.log(error);
-                    $('.showAlert').after('<div class="alert alert-danger modalValidate">'+error[0] + (error[1] != undefined ? '<br>' + error[1] : '') +'</div>');
-                    $('.modalValidate').delay(4000).fadeOut(500);
-                });
+                    console.log("erro: "+err);
+                    Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Preencha os dados corretamente!',
+                    })
+                // $('.modalValidate').empty();
+                // $.each(err.responseJSON.errors, function(key, error){
+                //     console.log(error);
+                //     $('.showAlert').after('<div class=" modalValidate alert card red lighten-4 red-text text-darken-4"><div class="card-content"><p><i class="material-icons">report</i><span>Erro: </span> '+error[0] + (error[1] != undefined ? '<br>' + error[1] : '') +'</p></div></div>');
+                //     $('.modalValidate').delay(4000).fadeOut(500);
+                // });
               }
             })
         });
-    </script> --}}
+    </script>
+
+    <script>
+
+        $(document).ready(function() {
+                $("body").on("click", "#deleteDoc", function(e) {
+                    e.preventDefault();
+
+                    Swal.fire({
+                        title: 'Tem certeza?',
+                        text: "O registro será removido permanentemente!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Sim',
+                        cancelButtonText: 'Cancelar'
+                        }).then((result) => {
+                        if (result.isConfirmed) {
+                            var id = $(this).data("id");
+                            var token = $("meta[name='csrf-token']").attr("content");
+                            var url = $(this).attr('href');
+                            console.log(url);
+                            $.ajax({
+                                url: url,
+                                type: 'DELETE',
+                                dataType: 'json',
+                                data: {
+                                    _token: token,
+                                    id: id
+                                },
+                                success: function(data) {
+                                    $("#reload").load("{{ route('pdf.index') }} #line");
+                                    Swal.fire(
+                                        'Deletado!',
+                                        'Arquivo removido com sucesso.',
+                                        'success'
+                                    );
+                                },
+                                error: function(err){
+                                    console.log(err);
+                                    Swal.fire(
+                                        'Oops...',
+                                        'Algo deu errado, tente novamente.',
+                                        'error'
+                                    );
+                                }
+                            });
+                        }
+                    })
+                });
+            });
+
+    </script>
 
 </body>
 </html>

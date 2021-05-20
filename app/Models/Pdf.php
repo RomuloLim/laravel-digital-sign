@@ -9,5 +9,5 @@ class Pdf extends Model
 {
     use HasFactory;
     protected $table = 'pdfs';
-    protected $guarded = ['id', 'user_id'];
+    protected $guarded = ['id'];
 }
