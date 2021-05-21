@@ -107,6 +107,7 @@ class PdfController extends Controller
                     return redirect()->back()->with('status', 'Arquivo .pfx ou senha inválida.');
                 }
 
+
         /*
         |--------------------------------------------------------------------------
         | Atualizando e assinando o PDF
@@ -117,29 +118,37 @@ class PdfController extends Controller
         $pdfToSign = Pdf::where('id', $id)->get();
         $fileLocate = public_path()."/storage/".$pdfToSign[0]->file_name;
 
+        // pegando nome do arquivo no banco sem o diretório
+        $onlyName = explode('/', $pdfToSign[0]->file_name);
+        $onlyName = $onlyName[1];
+
         $pdf = new Fpdi();
+        $pdf->SetTitle($onlyName);
         // assinando o PDF com a certificado (assinatura digital)
         $pdf->setSignature($certificate, $certificate, '', '', 2, '', 'A');
 
-        $pdf->AddPage();
-        $pdf->setSourceFile($fileLocate);
 
         // pegando quantidade de páginas do PDF a ser assinado
         $pdftext = file_get_contents($fileLocate);
         $num = preg_match_all("/\/Page\W/", $pdftext, $dummy);
-
+        // dd($num);
         // loop para criação do PDF
-        for($i = 1; $i < $num; $i++){
+        for($i = 1; $i < $num+1; $i++){
+            $pdf->AddPage();
+            $pdf->setSourceFile($fileLocate);
             $tplId = $pdf->importPage($i);
             $pdf->useTemplate($tplId, 0, 0);
             $pdf->Cell(0, 0, "Chave de acesso ${hashInfo}", 1, 1, 'C', 0, '', 0);
-            $pdf->AddPage();
         }
 
         $filenamePDF = md5($file->getClientOriginalName() . '-' . implode('-', explode(':', date('H:i:s'))).'.pdf');
-        $pdf->Output($path.'/'.$filenamePDF.'.pdf', 'FI'); // salva em um diretório
+        $pdf->Output($path.'/'.$onlyName, 'FI'); // salva em um diretório e mostra na tela
         // removendo o arquivo .pfx do local público
         File::delete($certificate);
+        //atualizando pdf no banco
+        Storage::delete($pdfToSign[0]->file_name);
+        $pdfToSign[0]->file_name = 'certificate/'.$onlyName;
+        $pdfToSign[0]->save();
     }
 
 }

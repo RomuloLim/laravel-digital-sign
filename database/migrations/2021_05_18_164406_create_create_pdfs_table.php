@@ -20,7 +20,6 @@ class CreateCreatePdfsTable extends Migration
             $table->string('name');
             $table->string('file_name');
             $table->string('author');
-            $table->string('password')->nullable();
             $table->timestamps();
         });
     }

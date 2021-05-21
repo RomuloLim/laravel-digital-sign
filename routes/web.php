@@ -18,17 +18,17 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/index', [PdfController::class, 'index'])->middleware(['auth'])->name('pdf.index');
-Route::get('/index/{id}', [PdfController::class, 'show'])->middleware(['auth'])->name('pdf.show');
-Route::delete('/delete/{id}', [PdfController::class, 'destroy'])->middleware(['auth'])->name('pdf.destroy');
-Route::post('/pdf/create', [PdfController::class, 'store'])->middleware(['auth'])->name('pdf.store');
-Route::get('/pdf/signPage/{id}', [PdfController::class, 'signPage'])->middleware(['auth'])->name('pdf.signPage');
-Route::post('/pdf/sign/{id}', [PdfController::class, 'sign'])->middleware(['auth'])->name('pdf.sign');
-
+Route::middleware(['auth'])->group(function(){
+Route::get('/index', [PdfController::class, 'index'])->name('pdf.index');
+Route::get('/index/{id}', [PdfController::class, 'show'])->name('pdf.show');
+Route::delete('/delete/{id}', [PdfController::class, 'destroy'])->name('pdf.destroy');
+Route::post('/pdf/create', [PdfController::class, 'store'])->name('pdf.store');
+Route::get('/pdf/signPage/{id}', [PdfController::class, 'signPage'])->name('pdf.signPage');
+Route::post('/pdf/sign/{id}', [PdfController::class, 'sign'])->name('pdf.sign');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
-})->middleware(['auth'])->name('dashboard');
+})->name('dashboard');
 
-
+});
 require __DIR__.'/auth.php';

@@ -34,8 +34,12 @@
             <td>{{ $doc->name }}</td>
             <td>{{ $doc->author }}</td>
             <td>
-                <a href="{{ route('pdf.signPage', $doc->id)}}" class="waves-effect waves-light btn green darken-1 tooltipped modal-trigger" data-position="left" data-tooltip="Assinar"><i class="large material-icons">check</i></a>
-                <a href="{{ route('pdf.show', $doc->id) }}" class="waves-effect waves-light btn cyan darken-1 tooltipped" data-position="top" data-tooltip="Ver"><i class="large material-icons">remove_red_eye</i></a>
+                @php
+                    $folder = explode('/', $doc->file_name);
+                    $folder = $folder[0];
+                @endphp
+                <a target="_blank" href="{{ route('pdf.signPage', $doc->id)}}" class="waves-effect waves-light btn green darken-1 tooltipped modal-trigger {{ ($folder == "certificate") ? 'disabled' : '' }}" data-position="left" data-tooltip="Assinar"><i class="large material-icons">check</i></a>
+                <a target="_blank" href="{{ route('pdf.show', $doc->id) }}" class="waves-effect waves-light btn cyan darken-1 tooltipped" data-position="top" data-tooltip="Ver"><i class="large material-icons">remove_red_eye</i></a>
                 <a href="{{ route('pdf.destroy', $doc->id) }}" class="waves-effect waves-light btn red darken-1 tooltipped" id="deleteDoc" data-position="right" data-tooltip="Deletar"><i class="large material-icons">delete</i></a>
             </td>
           </tr>
