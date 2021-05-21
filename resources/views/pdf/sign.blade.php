@@ -17,7 +17,7 @@
 
         <div class="container">
             <div class="row">
-                <form class="col s12" id="fileForm" enctype="multipart/form-data" method="POST">
+                <form class="col s12" action="{{ route('pdf.sign', $id) }}" id="fileForm" enctype="multipart/form-data" method="POST">
                     @csrf
                     <div class="row">
                         <div class="file-field input-field col s12">
@@ -43,6 +43,17 @@
             </div>
         </div>
 
+    @if (session('status'))
+        <!-- alerta de erro -->
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: '{{ session("status") }}',
+                confirmButtonColor: '#c44'
+            })
+        </script>
+    @endif
 
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!-- Compiled and minified JavaScript -->
