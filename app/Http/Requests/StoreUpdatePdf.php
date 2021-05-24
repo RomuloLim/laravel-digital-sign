@@ -24,9 +24,7 @@ class StoreUpdatePdf extends FormRequest
     public function rules()
     {
         return [
-            'name' => ['required'],
             'file_name' => ['required', 'file', 'mimes:pdf'],
-            'author' => ['required', 'min:3'],
         ];
     }
 }

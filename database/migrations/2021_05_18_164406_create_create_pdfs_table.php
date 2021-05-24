@@ -15,11 +15,9 @@ class CreateCreatePdfsTable extends Migration
     {
         Schema::create('pdfs', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id')->unsigned();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->string('name');
+            $table->uuid('user_id')->nullable();
+            $table->foreign('user_id')->references('user_uuid')->on('users')->onDelete('cascade');
             $table->string('file_name');
-            $table->string('author');
             $table->timestamps();
         });
     }
