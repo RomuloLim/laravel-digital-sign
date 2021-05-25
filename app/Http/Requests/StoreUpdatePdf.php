@@ -24,7 +24,18 @@ class StoreUpdatePdf extends FormRequest
     public function rules()
     {
         return [
-            'file_name' => ['required', 'file', 'mimes:pdf'],
+            'pdf' => ['required', 'file', 'mimes:pdf'],
+            'sign_name' => ['required', 'file'],
+            'password' => ['required']
+        ];
+    }
+
+    public function messages(){
+        return [
+            'message' => 'Erro ao processar os dados de envio',
+            'required' => 'O campo :attribute é obrigatório',
+            'file' => 'O campo :attribute deve receber um arquivo',
+            'pdf.mimes' => 'O campo :attribute deve receber um arquivo PDF',
         ];
     }
 }

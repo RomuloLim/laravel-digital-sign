@@ -26,6 +26,6 @@ Route::get('/index/{id}', [PdfController::class, 'show'])->name('pdf.show');
 Route::delete('/delete/{id}', [PdfController::class, 'destroy'])->name('pdf.destroy');
 Route::post('/pdf/create', [PdfController::class, 'store'])->name('pdf.store');
 Route::post('/user/create', [UserController::class, 'store'])->name('user.store');
-Route::get('/pdf/signPage/{id}', [PdfController::class, 'signPage'])->name('pdf.signPage');
-Route::post('/pdf/sign/{id}', [PdfController::class, 'sign'])->name('pdf.sign');
+// Route::get('/pdf/signPage/{id}', [PdfController::class, 'signPage'])->name('pdf.signPage');
+Route::post('/pdf/sign', [PdfController::class, 'sign'])->name('pdf.sign');
 

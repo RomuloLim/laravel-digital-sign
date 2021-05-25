@@ -57,12 +57,14 @@ class PdfController extends Controller
         return view('pdf.sign', compact('id'));
     }
 
-    public function sign($id, Request $request){
+    public function sign(StoreUpdatePdf $request){
          // pasta local pública onde o certificado .pfx será salvo temporariamente
          $path = base_path() . '/public/storage/certificate';
 
         // arquivo .pfx
         $file = $request->file('sign_name');
+
+        // dd($request->file('sign_name')->getMimeType());
 
         // criptografia do nome do arquivo .pfx
         $filename = md5($file->getClientOriginalName() . '-' . implode('-', explode(':', date('H:i:s')))) . '.' . $file->getClientOriginalExtension();
@@ -115,27 +117,28 @@ class PdfController extends Controller
         */
 
         // pegando o pdf do banco
-        $pdfToSign = Pdf::where('id', $id)->get();
-        $fileLocate = public_path()."/storage/".$pdfToSign[0]->file_name;
+        // $pdfToSign = Pdf::where('id', $id)->get();
+        // $fileLocate = public_path()."/storage/".$pdfToSign[0]->file_name;
 
+        $pdfToSign = $request->file('pdf');
         // pegando nome do arquivo no banco sem o diretório
-        $onlyName = explode('/', $pdfToSign[0]->file_name);
-        $onlyName = $onlyName[1];
+        $onlyName = $pdfToSign->getClientOriginalName();
 
         $pdf = new Fpdi('P', 'mm', 'P', true, 'UTF-8', false);
         $pdf->SetTitle($onlyName);
         // assinando o PDF com a certificado (assinatura digital)
         $pdf->setSignature($certificate, $certificate, '', '', 2, '', 'A');
 
+        // dd($pdfToSign->path());
 
         // pegando quantidade de páginas do PDF a ser assinado
-        $pdftext = file_get_contents($fileLocate);
+        $pdftext = file_get_contents($pdfToSign);
         $num = preg_match_all("/\/Page\W/", $pdftext, $dummy);
         // dd($num);
         // loop para criação do PDF
         for($i = 1; $i < $num+1; $i++){
             $pdf->AddPage();
-            $pdf->setSourceFile($fileLocate);
+            $pdf->setSourceFile($pdfToSign->path());
             $tplId = $pdf->importPage($i);
             $pdf->useTemplate($tplId, 0, 0);
             $pdf->Cell(0, 0, "Chave de acesso ${hashInfo}", 1, 1, 'C', 0, '', 0);
@@ -146,13 +149,9 @@ class PdfController extends Controller
         // dd($pdf);
 
         // $filenamePDF = md5($file->getClientOriginalName() . '-' . implode('-', explode(':', date('H:i:s'))).'.pdf');
-        $pdf->Output($path.'/'.$onlyName, 'FI'); // salva em um diretório e mostra na tela
+        $pdf->Output($path.'/'.$onlyName, 'I'); // salva em um diretório e mostra na tela
         // removendo o arquivo .pfx do local público
         File::delete($certificate);
-        //atualizando pdf no banco
-        Storage::delete($pdfToSign[0]->file_name);
-        $pdfToSign[0]->file_name = 'certificate/'.$onlyName;
-        $pdfToSign[0]->save();
     }
 
 }
