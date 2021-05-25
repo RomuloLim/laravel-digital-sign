@@ -106,7 +106,7 @@ class PdfController extends Controller
             File::delete($certificate);
 
             // se o conteúdo do arquivo .pfx for inválido
-            return redirect()->back()->with('status', 'Arquivo .pfx ou senha inválida.');
+            return response()->json(['erro' => 'Arquivo .pfx ou senha inválida.']);
         }
 
 
